@@ -1,142 +1,135 @@
-Description now available on Russian only.
+## Problem and solution
 
-## Проблема и решение
-
-Этот скрипт я использовал для некоторых нетривиальных переконфигураций 
-большого числа Jenkins джоб в автоматическом режиме. Пусть имеется порядка 1000
-CI-джоб с приблизительно похожей конфигурацией и необходимо внести изменения в 
-каждую из них. Например, обновить конфигурацию какого-то плагина. Поскольку 
-джоб много и их конфигурации однотипны, но не идентичны по структуре, заведомо 
-известно, что будут ошибки. Такие ошибки нужно уметь отслеживать, уметь 
-проходить процесс по шагам и автоматически, и быть готовым к откатыванию 
-конфигурации к исходному состоянию. Этот скрипт решает эти задачи.
+This script I used for some non-trivial reconfigurations 
+of large number of Jenkins gob in automatic mode. Let there be about 1000
+CI-job with approximately similar configuration and need to make changes to 
+every single one. For example, update configuration of a plugin. Cause jobs
+too many and their configurations are almost same, but not identical by 
+structure, obviously it is known that there will be errors. Such errors need
+to be able to track, be able to go through the process step by step and 
+automatically, and be ready to roll back configurations to the initial state.
+This script solves these problems.
 	
-## Использование
+## Usage
 
- 0. Убедитесь, что у вас установлена библиотека [requests](http://docs.python-requests.org/en/master/)
- 1. Откройте и отредактируйте файл `config.py`
- 2. Запустите `python reconf.py` (Python 2)
+ 0. Install [python-requests](http://docs.python-requests.org/en/master/) library
+ 1. Open and edit `config.py` file
+ 2. Execute `python reconf.py` (Python 2)
  
-## Конфигурация
+## Configuration
 
-### Режим ручного управления
+### Manual control mode
 
-В режиме ручного управления перед каждым следующим шагом запрашивается 
-подтверждение пользователя. Для продолжения нужно ввести "Y", "y" или 
-нажать Enter.
+In manual mode, user confirmation is requested before each next step. To 
+continue, enter "Y", " y " or press Enter.
 
-При отключённом режиме ручного управления скрипт будет исполнять 
-последовательно шаг за шагом. 
+If manual mode is disabled, the script will execute step by step.
  
-Включить режим ручного управления
+Enable manual control mode
 
 ```
      MANUAL_MODE = True
 ```
 
-Выключить режим ручного управления
+Disable manual control mode
 
 ```
      MANUAL_MODE = False
 ```
 
-### URL со списком CI джоб
+### URL with list of CI-jobs
 
-С этого адреса будут собраны все джобы, в которые нужно внести изменения.
+From this address will be collected all jobs in which you want to make changes.
 
 ```
 CI_URL_PREFIX = "https://cisrv.yourcompany.com/view/myview/"
 ```
 
-### Флаг отключения сбора CI-джоб с Jenkins
+### Disable collecting CI-jobs from Jenkins
 
-Установите USE_JOB_LIST = True, чтобы отключить сбор CI-джоб из CI_URL_PREFIX
-(предыдущий параметр). Список CI-джоб будет взят из файла
+Set `USE_JOB_LIST = True` to disable collecting CI-jobs from CI_URL_PREFIX 
+(previous parameter). List of CI-jobs will be taken from file.
 
 ```
 USE_JOB_LIST = True
-JOB_LIST_FILE = "modify.tx
+JOB_LIST_FILE = "modify.txt"
 ```
 
-### Имя пользователя
+### User
 
-Доменный пользователь из-под которого будут делаться запросы к Jenkins. 
-Внутри yourcompany'а любые запросы ко всем серверам Jenkins CI должны 
-происходить из-под какого-либо доменного пользователя
+Domain user. Inside yourcompany'а any requests to Jenkins CI servers can be 
+available from some domain user.
 
 ```
 USERNAME = "valeriy"
 ```
 
-### Пароль
+### Password
 
-Пароль доменного пользователя из-под которого будут делаться запросы к Jenkins.
+Password of domain user.
 
 ```
 PASSWORD = "your_password"
 ```
 
-### Имя папки с данными
+### Name of directory with data
 
-При запуске скрипта будет создана директория в том же месте, где лежит 
-скрипт. В неё будут записываться логи, конфигурация CI джоб и вообще любые 
-файлы и данные, относящиеся к последнему запуску скрипта. Вы можете 
-установить любое статическое имя:
+When you run script, a directory will be created in the same place where it
+is script. It will record logs, configuration CI job and in General any files 
+and data related to the last run of script. You can set any static name:
 
 ```
      LOCAL_STORAGE_DIR = "process"
 ```
 
-или генерировать автоматически имя на каждый запуск скрипта отдельно. 
-Например, создавать папку, содержащую в имени дату и время запуска:
+or generate it automatically for every execution: For example, you can create
+directory that contains timestamp in name:
 
 ```     
      LOCAL_STORAGE_DIR = "process-" + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
 ```
 
-### Имя файла с логами
+### Logging
 
-Скрипт автоматического переконфигурирования CI джоб достаточно подробно 
-логирует действия и ошибки. Вся эта информация записывается в файл. Файл 
-всё время дополняется и никогда не удаляется, не переименовывается, не 
-заменяется новым. 
+This script logs actions and errors in sufficient detail. All this information
+is recorded in a file. The file is always supplemented and never deleted,
+not renamed, not replaced by a new one. 
 
 ```
 LOG_FILE_NAME = "log.txt"
 ```
 
-### Имя директории с оригинальной конфигурацией CI джоб
+### Name of directory with original CI-jobs configuration
 
-Перед редактированием кофигурации на Jenkins-серверах скрипт сохраняет 
-исходную конфигурацию модифицируемых CI джоб, чтобы позднее можно было её 
-восстановить, если что-то пойдёт не так. Исходная конфигурация хранится в
-виде XML файлов в директории: LOCAL_STORAGE_DIR/CI_JOBS_CONFIGS_DIR
+Before editing configuration on Jenkins servers, script saves 
+original configuration of modified CI jobs so that it can be later 
+recover if something goes wrong. Original configuration is stored in
+XML files in the directory: `LOCAL_STORAGE_DIR/CI_JOBS_CONFIGS_DIR`
 
 ```
 CI_JOBS_CONFIGS_DIR = "jobs"
 ```
 
-### Имя директории с модифицированной конфигурацией CI джоб
+### Name of directory with changed CI-jobs configuration
 
-Перед редактированием кофигурации на Jenkins-серверах скрипт вносит 
-изменения в исходную конфигурацию CI джоб локально. Модифицированная 
-конфигурация хранится в виде XML файлов в директории: LOCAL_STORAGE_DIR/CI_JOBS_RECONFIGS_DIR
+Before editing configuration on Jenkins servers, script makes 
+changes in initial configuration of a CI job locally. Modified 
+configuration is stored as XML files in the directory: `LOCAL_STORAGE_DIR/CI_JOBS_RECONFIGS_DIR`
 
 ```
 CI_JOBS_RECONFIGS_DIR = "new_jobs"
 ```
 
-### Действие
+### Action
 
-Функция, выполняющая преобразование конфигурации. На вход получает файл.
-Возвращает модифицированную XML-конфигурацию как строку.
+Function that performs a configuration conversion. Receives the file. Returns 
+modified XML configuration as a string.
 
 ```
 def action(job_config):
     pass
 ```
 
-## Лицензия
+## Unlicense
 
-Все материалы этого репозитория доступны как общественное достояние. Делайте с
-этим кодом всё, что хотите.
+This is a public domain. Do whatever you want with this code.
