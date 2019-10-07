@@ -1,15 +1,30 @@
-## Problem and solution
+## Problem
 
-This script I used for some non-trivial reconfigurations 
-of large number of Jenkins gob in automatic mode. Let there be about 1000
-CI-job with approximately similar configuration and need to make changes to 
-every single one. For example, update configuration of a plugin. Cause jobs
-too many and their configurations are almost same, but not identical by 
-structure, obviously it is known that there will be errors. Such errors need
-to be able to track, be able to go through the process step by step and 
-automatically, and be ready to roll back configurations to the initial state.
-This script solves these problems.
-	
+Change part of configuration in a lot of jobs. For example update the plugin.
+Configuration of CI jobs is almost same but not identical.
+
+## Solution
+
+This script support:
+
+ 1. Step-by-step execution or automated execution
+ 2. Backups of CI-job configurations
+ 3. Custom actions (works with part of XML configuration, modify it as you want)
+
+Just add CI-jobs urls to `jobs.txt` and run script.
+
+Output example:
+
+```
+[09-10-2019 12:43:58] Starting migration process...
+[09-10-2019 12:44:23] STEP 1: Getting all CI jobs
+[09-10-2019 12:46:35] STEP 2: Backing up configuration of CI jobs
+[09-10-2019 12:47:12] STEP 3: Reconfigure locally saved CI jobs configs
+[09-10-2019 12:48:01] STEP 4: Disable all CI jobs before re-configuration
+[09-10-2019 12:49:03] STEP 5: Apply new configuration to CI jobs
+[09-10-2019 12:50:13] STEP 6: Enable all CI jobs after re-configuration
+```
+
 ## Usage
 
  0. Install [python-requests](http://docs.python-requests.org/en/master/) library
