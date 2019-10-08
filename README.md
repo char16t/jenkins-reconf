@@ -11,7 +11,7 @@ This script support:
  2. Backups of CI-job configurations
  3. Custom actions (works with part of XML configuration, modify it as you want)
 
-Just add CI-jobs urls to `jobs.txt` and run script.
+Just add CI-jobs urls to `modify.txt` and run script.
 
 Output example:
 
